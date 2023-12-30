@@ -289,6 +289,19 @@ if __name__ == "__main__":
         def pairing_completed(paired_nuki):
             logger.info(f"Pairing completed, nuki_public_key: {paired_nuki.nuki_public_key.hex()}")
             logger.info(f"Pairing completed, auth_id: {paired_nuki.auth_id.hex()}")
+            lock = {}
+            lock['address'] = address
+            lock['bridge_public_key'] = bridge_public_key
+            lock['bridge_private_key'] = bridge_private_key
+            lock['nuki_public_key'] = paired_nuki.nuki_public_key.hex()
+            lock['auth_id'] = paired_nuki.auth_id.hex()
+
+            if not 'smartlock' in data:
+                data['smartlock'] = []
+            data['smartlock'].append(lock)
+
+            with open(config_file, 'w') as file:
+                yaml.dump(data, file)
             loop.stop()
         loop.create_task(nuki.pair(pairing_completed))
         loop.run_forever()
